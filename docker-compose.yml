@@ -1,0 +1,76 @@
+version: "3.9"
+
+networks:
+  price-comparison-network:
+    name: price-comparison-network
+
+services:
+  scraper-amazon:
+    build:
+      context: ./services/scraper-amazon
+    container_name: scraper-amazon
+    networks:
+      - price-comparison-network
+    ports:
+      - "8001:8001"
+
+  scraper-flipkart:
+    build:
+      context: ./services/scraper-flipkart
+    container_name: scraper-flipkart
+    networks:
+      - price-comparison-network
+    ports:
+      - "8002:8002"
+
+  scraper-ebay:
+    build:
+      context: ./services/scraper-ebay
+    container_name: scraper-ebay
+    networks:
+      - price-comparison-network
+    ports:
+      - "8003:8003"
+
+  scraper-snapdeal:
+    build:
+      context: ./services/scraper-snapdeal
+    container_name: scraper-snapdeal
+    networks:
+      - price-comparison-network
+    ports:
+      - "8004:8004"
+
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+    container_name: api-gateway
+    networks:
+      - price-comparison-network
+    ports:
+      - "8000:8000"
+    depends_on:
+      - scraper-amazon
+      - scraper-flipkart
+      - scraper-ebay
+      - scraper-snapdeal
+    environment:
+      SCRAPER_AMAZON_URL: "http://scraper-amazon:8001"
+      SCRAPER_FLIPKART_URL: "http://scraper-flipkart:8002"
+      SCRAPER_EBAY_URL: "http://scraper-ebay:8003"
+      SCRAPER_SNAPDEAL_URL: "http://scraper-snapdeal:8004"
+      CACHE_TTL: "300"
+
+  frontend:
+    build:
+      context: ./services/frontend
+    container_name: frontend
+    networks:
+      - price-comparison-network
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway
+    environment:
+      GATEWAY_URL: "http://api-gateway:8000"
+
