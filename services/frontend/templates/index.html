@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PriceRadar – Distributed Price Comparison</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <div class="app-root">
+      <header class="nav">
+        <div class="nav-left">
+          <div class="logo-mark"></div>
+          <div class="logo-text">PriceRadar</div>
+        </div>
+        <div class="nav-right">
+          <span class="nav-tagline">Distributed price intelligence for modern stacks</span>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="hero">
+          <h1 class="hero-title">
+            <span class="hero-title-gradient">PriceRadar</span>
+          </h1>
+          <p class="hero-subtitle">
+            Compare prices across Amazon, Flipkart, eBay &amp; Snapdeal instantly.
+          </p>
+          <div class="platform-badges">
+            <span class="badge badge-amazon">Amazon</span>
+            <span class="badge badge-flipkart">Flipkart</span>
+            <span class="badge badge-ebay">eBay</span>
+            <span class="badge badge-snapdeal">Snapdeal</span>
+          </div>
+
+          <div class="search-container">
+            <div class="search-input-wrapper">
+              <input
+                id="search-input"
+                type="text"
+                placeholder="Search for iPhone 15, PS5, MacBook Air…"
+                autocomplete="off"
+              />
+              <button id="search-button" type="button">Search</button>
+            </div>
+            <p class="search-hint">
+              Fan-out aggregation via FastAPI · Cached in-memory · Live scrapers for eBay &amp; Snapdeal.
+            </p>
+          </div>
+        </section>
+
+        <section id="summary-bar" class="summary hidden">
+          <div class="summary-text">
+            <span id="summary-count"></span>
+            <span class="summary-divider">|</span>
+            <span id="summary-best"></span>
+            <span class="summary-divider">|</span>
+            <span id="summary-time"></span>
+          </div>
+        </section>
+
+        <section id="error-state" class="error-state hidden">
+          <div class="error-icon">!</div>
+          <div class="error-message" id="error-message"></div>
+        </section>
+
+        <section id="results-container" class="results">
+          <div id="skeleton-grid" class="results-grid hidden"></div>
+          <div id="results-grid" class="results-grid hidden"></div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>PriceRadar — Distributed Systems Demo</span>
+        <span class="dot">•</span>
+        <span>FastAPI · Flask · Docker · Kubernetes</span>
+      </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>
+
