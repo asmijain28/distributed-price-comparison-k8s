@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scraper-amazon
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: scraper-amazon
+  template:
+    metadata:
+      labels:
+        app: scraper-amazon
+    spec:
+      containers:
+        - name: scraper-amazon
+          image: ghcr.io/OWNER/scraper-amazon:latest
+          ports:
+            - containerPort: 8001
+          envFrom:
+            - configMapRef:
+                name: price-comparison-config
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "256Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scraper-amazon-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: scraper-amazon
+  ports:
+    - port: 8001
+      targetPort: 8001
+

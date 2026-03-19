@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: price-comparison-config
+data:
+  SCRAPER_AMAZON_URL: "http://scraper-amazon-svc:8001"
+  SCRAPER_FLIPKART_URL: "http://scraper-flipkart-svc:8002"
+  SCRAPER_EBAY_URL: "http://scraper-ebay-svc:8003"
+  SCRAPER_SNAPDEAL_URL: "http://scraper-snapdeal-svc:8004"
+  CACHE_TTL: "300"
+  GATEWAY_URL: "http://gateway-svc:8000"
+
