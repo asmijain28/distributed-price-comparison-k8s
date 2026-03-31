@@ -7,9 +7,7 @@ from typing import List
 
 import pandas as pd
 from fastapi import APIRouter, HTTPException, Query
-
 from models import PriceResult, SearchResponse
-
 
 router = APIRouter()
 

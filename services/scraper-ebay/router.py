@@ -7,9 +7,7 @@ from typing import List
 import requests
 from bs4 import BeautifulSoup
 from fastapi import APIRouter, HTTPException, Query
-
 from models import PriceResult, SearchResponse
-
 
 logger = logging.getLogger(__name__)
 

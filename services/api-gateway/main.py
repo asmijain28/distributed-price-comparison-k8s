@@ -28,7 +28,6 @@ import httpx
 from cachetools import TTLCache
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 
 # ── Logging ─────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -112,10 +111,26 @@ async def _call_scraper(
         return (key, [], None)
     except httpx.TimeoutException:
         logger.warning("Timeout calling %s scraper", info["name"])
-        return (key, [], {"source": info["name"], "error_type": "timeout", "message": f"{info['name']} scraper timed out after {GATEWAY_TIMEOUT}s"})
+        return (
+    key,
+    [],
+    {
+        "source": info["name"],
+        "error_type": "timeout",
+        "message": f"{info['name']} scraper timed out after {GATEWAY_TIMEOUT}s",
+    },
+)
     except httpx.HTTPStatusError as exc:
         logger.warning("HTTP %d from %s scraper", exc.response.status_code, info["name"])
-        return (key, [], {"source": info["name"], "error_type": "http_error", "message": f"HTTP {exc.response.status_code}"})
+        return (
+    key,
+    [],
+    {
+        "source": info["name"],
+        "error_type": "http_error",
+        "message": f"HTTP {exc.response.status_code}",
+    },
+)
     except Exception as exc:
         logger.exception("Error calling %s scraper", info["name"])
         return (key, [], {"source": info["name"], "error_type": "connection_error", "message": str(exc)})
