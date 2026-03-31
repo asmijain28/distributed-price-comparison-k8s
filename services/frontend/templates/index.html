@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PriceRadar — Live Indian Price Comparison</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- ─── Header ────────────────────────────────────────────────── -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="logo">
+                <div class="logo-mark">
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                        <circle cx="11" cy="11" r="10" stroke="currentColor" stroke-width="1.8"/>
+                        <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.8"/>
+                        <circle cx="11" cy="11" r="2.5" fill="currentColor"/>
+                        <line x1="11" y1="1" x2="11" y2="4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        <line x1="11" y1="17.5" x2="11" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        <line x1="1" y1="11" x2="4.5" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        <line x1="17.5" y1="11" x2="21" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <span class="logo-text">PriceRadar</span>
+                <span class="logo-badge">v2</span>
+            </div>
+            <div class="header-right">
+                <div class="platform-dots">
+                    <span class="dot" style="background:#FF9900" title="Amazon"></span>
+                    <span class="dot" style="background:#2874F0" title="Flipkart"></span>
+                    <span class="dot" style="background:#FF3F6C" title="Myntra"></span>
+                    <span class="dot" style="background:#E02020" title="Snapdeal"></span>
+                </div>
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">
+                    <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ─── Hero ──────────────────────────────────────────────────── -->
+    <section class="hero">
+        <div class="hero-eyebrow">
+            <span class="live-dot"></span>
+            Live prices from 4 platforms
+        </div>
+        <h1 class="hero-title">Find the <span class="highlight">best price</span><br>across India's top stores</h1>
+        <p class="hero-subtitle">Real-time comparison across Amazon, Flipkart, Myntra & Snapdeal</p>
+
+        <div class="search-container">
+            <div class="search-box" id="searchBox">
+                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="searchInput" placeholder="Search for any product…" autocomplete="off" autofocus spellcheck="false">
+                <button id="searchBtn" class="search-btn">
+                    <span class="btn-text">Search</span>
+                    <svg class="btn-spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                </button>
+            </div>
+            <div class="example-queries">
+                <span class="eq-label">Try:</span>
+                <button class="example-chip" data-q="iPhone 16">iPhone 16</button>
+                <button class="example-chip" data-q="boAt earbuds">boAt earbuds</button>
+                <button class="example-chip" data-q="face wash">face wash</button>
+                <button class="example-chip" data-q="formal shirt men">formal shirt</button>
+                <button class="example-chip" data-q="Nike shoes">Nike shoes</button>
+                <button class="example-chip" data-q="laptop">laptop</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── Controls Bar ──────────────────────────────────────────── -->
+    <section class="controls" id="controlsBar" style="display:none">
+        <div class="controls-inner">
+            <div class="platform-filters">
+                <button class="platform-chip active" data-platform="all">All</button>
+                <button class="platform-chip" data-platform="amazon" style="--c:#FF9900">🛒 Amazon</button>
+                <button class="platform-chip" data-platform="flipkart" style="--c:#2874F0">🏷️ Flipkart</button>
+                <button class="platform-chip" data-platform="myntra" style="--c:#FF3F6C">👗 Myntra</button>
+                <button class="platform-chip" data-platform="snapdeal" style="--c:#E02020">🔖 Snapdeal</button>
+            </div>
+            <div class="sort-options">
+                <button class="sort-chip active" data-sort="relevance">Relevance</button>
+                <button class="sort-chip" data-sort="price_asc">Price ↑</button>
+                <button class="sort-chip" data-sort="price_desc">Price ↓</button>
+                <button class="sort-chip" data-sort="rating">Top Rated</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── Status bar ────────────────────────────────────────────── -->
+    <div class="status-bar" id="statusBar" style="display:none">
+        <div class="status-inner">
+            <span id="resultCount"></span>
+            <span id="cacheStatus"></span>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ─── Results ───────────────────────────────────────────────── -->
+    <main class="results-container" id="resultsContainer">
+        <div class="skeleton-grid" id="skeletonGrid" style="display:none">
+            <div class="skeleton-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w20"></div><div class="sk-line w85"></div><div class="sk-line w60"></div><div class="sk-line w35"></div></div></div>
+            <div class="skeleton-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w20"></div><div class="sk-line w85"></div><div class="sk-line w60"></div><div class="sk-line w35"></div></div></div>
+            <div class="skeleton-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w20"></div><div class="sk-line w85"></div><div class="sk-line w60"></div><div class="sk-line w35"></div></div></div>
+            <div class="skeleton-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w20"></div><div class="sk-line w85"></div><div class="sk-line w60"></div><div class="sk-line w35"></div></div></div>
+            <div class="skeleton-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w20"></div><div class="sk-line w85"></div><div class="sk-line w60"></div><div class="sk-line w35"></div></div></div>
+            <div class="skeleton-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w20"></div><div class="sk-line w85"></div><div class="sk-line w60"></div><div class="sk-line w35"></div></div></div>
+        </div>
+
+        <div class="product-grid" id="productGrid"></div>
+
+        <div class="empty-state" id="emptyState" style="display:none">
+            <div class="empty-icon">🔎</div>
+            <h3>No products found</h3>
+            <p>Try a different search query or broaden your platform filter.</p>
+        </div>
+
+        <div class="error-state" id="errorState" style="display:none">
+            <div class="empty-icon">⚠️</div>
+            <h3 id="errorTitle">Something went wrong</h3>
+            <p id="errorMessage">Please try again in a moment.</p>
+        </div>
+    </main>
+
+    <!-- ─── Pagination ─────────────────────────────────────────────── -->
+    <div class="pagination" id="pagination" style="display:none">
+        <button class="page-btn" id="prevPage">← Prev</button>
+        <span class="page-info" id="pageInfo"></span>
+        <button class="page-btn" id="nextPage">Next →</button>
+    </div>
+
+    <!-- ─── Footer ────────────────────────────────────────────────── -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-logo">
+                <span>📡</span>
+                <strong>PriceRadar v2</strong>
+            </div>
+            <p>Live scraping · Amazon · Flipkart · Myntra · Snapdeal</p>
+            <p class="footer-sub">Academic project · Manipal University Jaipur · B.Tech CS (Data Science)</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

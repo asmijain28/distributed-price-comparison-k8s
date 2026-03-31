@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scraper-nykaa
+  labels:
+    app: priceradar
+    component: scraper-nykaa
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      component: scraper-nykaa
+  template:
+    metadata:
+      labels:
+        app: priceradar
+        component: scraper-nykaa
+    spec:
+      containers:
+        - name: scraper-nykaa
+          image: ghcr.io/OWNER/priceradar-scraper-nykaa:latest
+          ports:
+            - containerPort: 8005
+          envFrom:
+            - configMapRef:
+                name: priceradar-config
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8005
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8005
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scraper-nykaa-svc
+  labels:
+    app: priceradar
+    component: scraper-nykaa
+spec:
+  selector:
+    component: scraper-nykaa
+  ports:
+    - port: 8005
+      targetPort: 8005
+  type: ClusterIP

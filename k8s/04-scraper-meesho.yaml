@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scraper-meesho
+  labels:
+    app: priceradar
+    component: scraper-meesho
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      component: scraper-meesho
+  template:
+    metadata:
+      labels:
+        app: priceradar
+        component: scraper-meesho
+    spec:
+      containers:
+        - name: scraper-meesho
+          image: ghcr.io/OWNER/priceradar-scraper-meesho:latest
+          ports:
+            - containerPort: 8004
+          envFrom:
+            - configMapRef:
+                name: priceradar-config
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8004
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8004
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scraper-meesho-svc
+  labels:
+    app: priceradar
+    component: scraper-meesho
+spec:
+  selector:
+    component: scraper-meesho
+  ports:
+    - port: 8004
+      targetPort: 8004
+  type: ClusterIP

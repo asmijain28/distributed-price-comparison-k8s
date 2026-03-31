@@ -1,76 +1,93 @@
-version: "3.9"
+###############################################################################
+# PriceRadar v2 — Docker Compose (local development)
+###############################################################################
+# Usage:  docker-compose up --build
+# UI:     http://localhost:3000
+# API:    http://localhost:8000/search?q=iPhone
+###############################################################################
 
-networks:
-  price-comparison-network:
-    name: price-comparison-network
+x-common-env: &common-env
+  SCRAPE_DELAY_MS: "500"
+  SCRAPE_TIMEOUT_SECONDS: "8"
 
 services:
+  # ── Scraper: Amazon India ────────────────────────────────────────────
   scraper-amazon:
     build:
-      context: ./services/scraper-amazon
-    container_name: scraper-amazon
-    networks:
-      - price-comparison-network
+      context: ./services
+      dockerfile: scraper-amazon/Dockerfile
     ports:
       - "8001:8001"
+    environment:
+      <<: *common-env
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
+  # ── Scraper: Flipkart ────────────────────────────────────────────────
   scraper-flipkart:
     build:
-      context: ./services/scraper-flipkart
-    container_name: scraper-flipkart
-    networks:
-      - price-comparison-network
+      context: ./services
+      dockerfile: scraper-flipkart/Dockerfile
     ports:
       - "8002:8002"
+    environment:
+      <<: *common-env
+    restart: on-failure
 
-  scraper-ebay:
+  # ── Scraper: Myntra ──────────────────────────────────────────────────
+  scraper-myntra:
     build:
-      context: ./services/scraper-ebay
-    container_name: scraper-ebay
-    networks:
-      - price-comparison-network
+      context: ./services
+      dockerfile: scraper-myntra/Dockerfile
     ports:
       - "8003:8003"
+    environment:
+      <<: *common-env
+    restart: on-failure
 
+  # ── Scraper: Snapdeal ────────────────────────────────────────────────
   scraper-snapdeal:
     build:
-      context: ./services/scraper-snapdeal
-    container_name: scraper-snapdeal
-    networks:
-      - price-comparison-network
+      context: ./services
+      dockerfile: scraper-snapdeal/Dockerfile
     ports:
       - "8004:8004"
+    environment:
+      <<: *common-env
+    restart: on-failure
 
+  # ── API Gateway ──────────────────────────────────────────────────────
   api-gateway:
     build:
       context: ./services/api-gateway
-    container_name: api-gateway
-    networks:
-      - price-comparison-network
     ports:
       - "8000:8000"
+    environment:
+      SCRAPER_AMAZON_URL: http://scraper-amazon:8001
+      SCRAPER_FLIPKART_URL: http://scraper-flipkart:8002
+      SCRAPER_MYNTRA_URL: http://scraper-myntra:8003
+      SCRAPER_SNAPDEAL_URL: http://scraper-snapdeal:8004
+      CACHE_TTL: "300"
+      GATEWAY_TIMEOUT_SECONDS: "10"
     depends_on:
       - scraper-amazon
       - scraper-flipkart
-      - scraper-ebay
+      - scraper-myntra
       - scraper-snapdeal
-    environment:
-      SCRAPER_AMAZON_URL: "http://scraper-amazon:8001"
-      SCRAPER_FLIPKART_URL: "http://scraper-flipkart:8002"
-      SCRAPER_EBAY_URL: "http://scraper-ebay:8003"
-      SCRAPER_SNAPDEAL_URL: "http://scraper-snapdeal:8004"
-      CACHE_TTL: "300"
+    restart: on-failure
 
+  # ── Frontend ─────────────────────────────────────────────────────────
   frontend:
     build:
       context: ./services/frontend
-    container_name: frontend
-    networks:
-      - price-comparison-network
     ports:
       - "3000:3000"
+    environment:
+      GATEWAY_URL: http://api-gateway:8000
     depends_on:
       - api-gateway
-    environment:
-      GATEWAY_URL: "http://api-gateway:8000"
-
+    restart: on-failure

@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scraper-myntra
+  labels:
+    app: priceradar
+    component: scraper-myntra
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      component: scraper-myntra
+  template:
+    metadata:
+      labels:
+        app: priceradar
+        component: scraper-myntra
+    spec:
+      containers:
+        - name: scraper-myntra
+          image: ghcr.io/OWNER/priceradar-scraper-myntra:latest
+          ports:
+            - containerPort: 8003
+          envFrom:
+            - configMapRef:
+                name: priceradar-config
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8003
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8003
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scraper-myntra-svc
+  labels:
+    app: priceradar
+    component: scraper-myntra
+spec:
+  selector:
+    component: scraper-myntra
+  ports:
+    - port: 8003
+      targetPort: 8003
+  type: ClusterIP

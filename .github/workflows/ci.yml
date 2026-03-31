@@ -1,0 +1,119 @@
+###############################################################################
+# PriceRadar v2 — CI/CD Pipeline
+###############################################################################
+# On push to main:
+#   1. Lint all Python services with ruff
+#   2. Build and push Docker images in parallel (matrix strategy)
+#   3. Run integration health-check test
+###############################################################################
+
+name: PriceRadar CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/priceradar
+
+jobs:
+  # ── Lint ─────────────────────────────────────────────────────
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Lint all services
+        run: |
+          find services -name "*.py" | xargs ruff check
+
+  # ── Build & Push Docker Images ───────────────────────────────
+  build:
+    needs: lint
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        service:
+          - name: scraper-amazon
+            context: ./services
+            dockerfile: scraper-amazon/Dockerfile
+          - name: scraper-flipkart
+            context: ./services
+            dockerfile: scraper-flipkart/Dockerfile
+          - name: scraper-myntra
+            context: ./services
+            dockerfile: scraper-myntra/Dockerfile
+          - name: scraper-meesho
+            context: ./services
+            dockerfile: scraper-meesho/Dockerfile
+          - name: scraper-nykaa
+            context: ./services
+            dockerfile: scraper-nykaa/Dockerfile
+          - name: scraper-croma
+            context: ./services
+            dockerfile: scraper-croma/Dockerfile
+          - name: api-gateway
+            context: ./services/api-gateway
+            dockerfile: Dockerfile
+          - name: frontend
+            context: ./services/frontend
+            dockerfile: Dockerfile
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.service.context }}
+          file: ${{ matrix.service.context }}/${{ matrix.service.dockerfile }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service.name }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service.name }}:${{ github.sha }}
+
+  # ── Integration Test ─────────────────────────────────────────
+  integration-test:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start services
+        run: docker-compose up --build -d
+
+      - name: Wait for services
+        run: sleep 15
+
+      - name: Health check — API Gateway
+        run: |
+          curl -sf http://localhost:8000/health | python3 -m json.tool
+
+      - name: Health check — Frontend
+        run: |
+          curl -sf http://localhost:3000/health | python3 -m json.tool
+
+      - name: Teardown
+        if: always()
+        run: docker-compose down

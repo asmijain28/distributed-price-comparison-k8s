@@ -1,0 +1,8 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+select = ["E", "F", "W", "I"]
+ignore = ["E402"]  # allow module-level imports not at top (needed for sys.path hack)
+
+[tool.ruff.lint.isort]
+known-first-party = ["common"]

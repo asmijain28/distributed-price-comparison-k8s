@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: priceradar-config
+  labels:
+    app: priceradar
+data:
+  # Scraper URLs (Kubernetes DNS service names)
+  SCRAPER_AMAZON_URL: "http://scraper-amazon-svc:8001"
+  SCRAPER_FLIPKART_URL: "http://scraper-flipkart-svc:8002"
+  SCRAPER_MYNTRA_URL: "http://scraper-myntra-svc:8003"
+  SCRAPER_MEESHO_URL: "http://scraper-meesho-svc:8004"
+  SCRAPER_NYKAA_URL: "http://scraper-nykaa-svc:8005"
+  SCRAPER_CROMA_URL: "http://scraper-croma-svc:8006"
+
+  # Gateway config
+  GATEWAY_URL: "http://gateway-svc:8000"
+  CACHE_TTL: "300"
+  GATEWAY_TIMEOUT_SECONDS: "10"
+
+  # Scraper config
+  SCRAPE_DELAY_MS: "500"
+  SCRAPE_TIMEOUT_SECONDS: "8"

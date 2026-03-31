@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  labels:
+    app: priceradar
+    component: api-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      component: api-gateway
+  template:
+    metadata:
+      labels:
+        app: priceradar
+        component: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: ghcr.io/OWNER/priceradar-api-gateway:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: priceradar-config
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-svc
+  labels:
+    app: priceradar
+    component: api-gateway
+spec:
+  selector:
+    component: api-gateway
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP
