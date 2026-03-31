@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scraper-snapdeal
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: scraper-snapdeal
+  template:
+    metadata:
+      labels:
+        app: scraper-snapdeal
+    spec:
+      containers:
+        - name: scraper-snapdeal
+          image: ghcr.io/OWNER/scraper-snapdeal:latest
+          ports:
+            - containerPort: 8004
+          envFrom:
+            - configMapRef:
+                name: price-comparison-config
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8004
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8004
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "256Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scraper-snapdeal-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: scraper-snapdeal
+  ports:
+    - port: 8004
+      targetPort: 8004
+

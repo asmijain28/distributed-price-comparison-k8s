@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scraper-ebay
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: scraper-ebay
+  template:
+    metadata:
+      labels:
+        app: scraper-ebay
+    spec:
+      containers:
+        - name: scraper-ebay
+          image: ghcr.io/OWNER/scraper-ebay:latest
+          ports:
+            - containerPort: 8003
+          envFrom:
+            - configMapRef:
+                name: price-comparison-config
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8003
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8003
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "256Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scraper-ebay-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: scraper-ebay
+  ports:
+    - port: 8003
+      targetPort: 8003
+
