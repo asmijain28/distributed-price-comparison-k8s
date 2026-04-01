@@ -1,12 +1,100 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PriceRadar — Live Indian Price Comparison</title>
+    <title>BuyItNow — Live Indian Price Comparison</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        /* ── Image Search Styles ── */
+        .image-search-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .img-search-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1.5px solid var(--border, #e0e0e0);
+            background: var(--surface, #fff);
+            color: var(--text-secondary, #555);
+            font-size: 0.82rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+        .img-search-btn:hover {
+            border-color: var(--accent, #6c63ff);
+            color: var(--accent, #6c63ff);
+            background: var(--accent-soft, #f0eeff);
+        }
+        .img-search-btn svg { flex-shrink: 0; }
+        .img-search-divider {
+            font-size: 0.75rem;
+            color: var(--text-muted, #aaa);
+        }
+        #imagePreviewWrap {
+            display: none;
+            margin-top: 10px;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        #imagePreviewWrap.visible { display: flex; }
+        #imagePreview {
+            width: 52px;
+            height: 52px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid var(--accent, #6c63ff);
+        }
+        #clearImageBtn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary, #888);
+            font-size: 1.1rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+            transition: color 0.15s;
+        }
+        #clearImageBtn:hover { color: #e02020; }
+        #imageFileName {
+            font-size: 0.8rem;
+            color: var(--text-secondary, #777);
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ── Best Price Badge ── */
+        .product-card.best-price {
+            border: 2px solid #22c55e !important;
+            position: relative;
+        }
+        .best-price-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #22c55e;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 999px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            z-index: 2;
+            box-shadow: 0 2px 8px rgba(34,197,94,0.25);
+        }
+    </style>
 </head>
 <body>
 
@@ -25,8 +113,8 @@
                         <line x1="17.5" y1="11" x2="21" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <span class="logo-text">PriceRadar</span>
-                <span class="logo-badge">v2</span>
+                <span class="logo-text">BuyItNow</span>
+                
             </div>
             <div class="header-right">
                 <div class="platform-dots">
@@ -61,6 +149,33 @@
                     <svg class="btn-spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
                 </button>
             </div>
+
+            <!-- ─── Image Search Row ───────────────────────────────── -->
+            <div class="image-search-row">
+                <!-- Camera (capture) -->
+                <label class="img-search-btn" for="cameraInput" title="Take a photo">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    Camera
+                </label>
+                <span class="img-search-divider"></span>
+                <!-- Gallery (file upload) -->
+                <label class="img-search-btn" for="galleryInput" title="Upload from gallery">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    Upload from Gallery
+                </label>
+            </div>
+
+            <!-- Hidden file inputs -->
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+            <input type="file" id="galleryInput" accept="image/*" style="display:none">
+
+            <!-- Image preview -->
+            <div id="imagePreviewWrap">
+                <img id="imagePreview" src="" alt="Selected image">
+                <span id="imageFileName"></span>
+                <button id="clearImageBtn" title="Remove image">✕</button>
+            </div>
+
             <div class="example-queries">
                 <span class="eq-label">Try:</span>
                 <button class="example-chip" data-q="iPhone 16">iPhone 16</button>
@@ -139,14 +254,14 @@
     <footer class="footer">
         <div class="footer-inner">
             <div class="footer-logo">
-                <span>📡</span>
-                <strong>PriceRadar v2</strong>
+                <span>🛒</span>
+                <strong>BuyItNow</strong>
             </div>
-            <p>Live scraping · Amazon · Flipkart · Myntra · Snapdeal</p>
-            <p class="footer-sub">Academic project · Manipal University Jaipur · B.Tech CS (Data Science)</p>
+
         </div>
     </footer>
 
     <script src="/static/js/app.js"></script>
+    
 </body>
 </html>
