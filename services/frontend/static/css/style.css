@@ -577,6 +577,12 @@ body {
     box-shadow: 0 2px 6px rgba(22,163,74,0.35);
 }
 
+/* Best price card highlight */
+.product-card.best-price {
+    border: 2px solid var(--green);
+    box-shadow: 0 0 0 3px rgba(22,163,74,0.12), var(--shadow-card);
+}
+
 /* ─── Skeleton ───────────────────────────────────────────────── */
 .skeleton-grid {
     display: grid;

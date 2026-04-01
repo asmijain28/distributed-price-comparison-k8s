@@ -186,18 +186,28 @@
 
     // ── Render ──────────────────────────────────────────────────
     function renderProducts(results) {
-        let minPrice = Infinity, minIdx = -1;
-        results.forEach((r, i) => { if (r.price < minPrice) { minPrice = r.price; minIdx = i; } });
+        // Find the true lowest price
+        let minPrice = Infinity;
+        results.forEach(r => { if ((r.price ?? Infinity) < minPrice) minPrice = r.price; });
+
+        // Move best price item to position 0
+        const bestIdx = results.findIndex(r => r.price === minPrice);
+        if (bestIdx > 0) {
+            const sorted = [...results];
+            const [best] = sorted.splice(bestIdx, 1);
+            sorted.unshift(best);
+            results = sorted;
+        }
 
         const html = results.map((r, i) => {
             const key   = (r.platform || '').toLowerCase().replace(/\s+/g, '');
             const color = PLATFORM_COLORS[key] || '#5B4CF5';
-            const best  = i === minIdx && results.length > 1;
+            const best  = r.price === minPrice && results.length > 1;
 
             return `
-<div class="product-card">
+<div class="product-card${best ? ' best-price' : ''}">
   <div class="card-stripe" style="background:${color}"></div>
-  ${best ? '<div class="best-deal-badge">Best Deal</div>' : ''}
+  ${best ? '<div class="best-deal-badge">🏷️ Best Price</div>' : ''}
   <div class="card-img-wrap">
     ${r.image_url
         ? `<img src="${escAttr(r.image_url)}" alt="${escAttr(r.title)}" loading="lazy">`
@@ -270,4 +280,52 @@
             setTimeout(() => t.remove(), 300);
         }, 5000);
     }
+    // ── Image search ─────────────────────────────────────────────
+    const cameraInput  = document.getElementById('cameraInput');
+    const galleryInput = document.getElementById('galleryInput');
+    const previewWrap  = document.getElementById('imagePreviewWrap');
+    const previewImg   = document.getElementById('imagePreview');
+    const fileNameSpan = document.getElementById('imageFileName');
+    const clearBtn     = document.getElementById('clearImageBtn');
+
+    async function handleImageFile(file) {
+        if (!file) return;
+        if (previewImg)   previewImg.src = URL.createObjectURL(file);
+        if (fileNameSpan) fileNameSpan.textContent = file.name;
+        if (previewWrap)  previewWrap.classList.add('visible');
+
+        showSkeleton();
+        hideStates();
+        controlsBar.style.display = '';
+
+        try {
+            const formData = new FormData();
+            formData.append('image', file);
+            const labelRes = await fetch('/api/image-search', { method: 'POST', body: formData });
+            if (!labelRes.ok) throw new Error('Image analysis failed');
+            const { query, error } = await labelRes.json();
+            if (error) throw new Error(error);
+            searchInput.value = query;
+            currentQuery = query;
+            currentPage  = 1;
+            fetchResults();
+        } catch (err) {
+            hideSkeleton();
+            showError(err.message || 'Could not identify the product. Try typing a search instead.');
+        }
+    }
+
+    if (cameraInput)  cameraInput.addEventListener('change',  e => handleImageFile(e.target.files[0]));
+    if (galleryInput) galleryInput.addEventListener('change', e => handleImageFile(e.target.files[0]));
+
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            if (previewImg)   previewImg.src = '';
+            if (fileNameSpan) fileNameSpan.textContent = '';
+            if (previewWrap)  previewWrap.classList.remove('visible');
+            if (cameraInput)  cameraInput.value = '';
+            if (galleryInput) galleryInput.value = '';
+        });
+    }
+
 })();
