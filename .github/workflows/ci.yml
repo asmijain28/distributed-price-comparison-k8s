@@ -1,11 +1,6 @@
 ###############################################################################
 # PriceRadar v2 — CI/CD Pipeline
 ###############################################################################
-# On push to main:
-#   1. Lint all Python services with ruff
-#   2. Build and push Docker images in parallel (matrix strategy)
-#   3. Run integration health-check test
-###############################################################################
 
 name: PriceRadar CI/CD
 
@@ -52,27 +47,27 @@ jobs:
           - name: scraper-amazon
             context: ./services
             dockerfile: scraper-amazon/Dockerfile
+
           - name: scraper-flipkart
             context: ./services
             dockerfile: scraper-flipkart/Dockerfile
+
           - name: scraper-myntra
             context: ./services
             dockerfile: scraper-myntra/Dockerfile
-          - name: scraper-meesho
+
+          - name: scraper-snapdeal
             context: ./services
-            dockerfile: scraper-meesho/Dockerfile
-          - name: scraper-nykaa
-            context: ./services
-            dockerfile: scraper-nykaa/Dockerfile
-          - name: scraper-croma
-            context: ./services
-            dockerfile: scraper-croma/Dockerfile
+            dockerfile: scraper-snapdeal/Dockerfile
+
           - name: api-gateway
             context: ./services/api-gateway
             dockerfile: Dockerfile
+
           - name: frontend
             context: ./services/frontend
             dockerfile: Dockerfile
+
     steps:
       - uses: actions/checkout@v4
 
