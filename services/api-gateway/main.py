@@ -217,6 +217,19 @@ async def search(
     # Sort
     sorted_results = _sort_results(all_results, sort)
 
+    # Find the global best price index and tag it
+    if sorted_results:
+        best_idx = min(
+            range(len(sorted_results)),
+            key=lambda i: sorted_results[i].get("price") or float("inf"),
+        )
+        # Move it to position 0
+        if best_idx != 0:
+            best_item = sorted_results.pop(best_idx)
+            sorted_results.insert(0, best_item)
+        # Tag only the first item as global best
+        sorted_results[0] = {**sorted_results[0], "global_best": True}
+
     # Paginate
     total = len(sorted_results)
     start = (page - 1) * limit

@@ -184,25 +184,11 @@
         }
     }
 
-    // ── Render ──────────────────────────────────────────────────
     function renderProducts(results) {
-        // Find the true lowest price
-        let minPrice = Infinity;
-        results.forEach(r => { if ((r.price ?? Infinity) < minPrice) minPrice = r.price; });
-
-        // Move best price item to position 0
-        const bestIdx = results.findIndex(r => r.price === minPrice);
-        if (bestIdx > 0) {
-            const sorted = [...results];
-            const [best] = sorted.splice(bestIdx, 1);
-            sorted.unshift(best);
-            results = sorted;
-        }
-
-        const html = results.map((r, i) => {
+        const html = results.map((r) => {
             const key   = (r.platform || '').toLowerCase().replace(/\s+/g, '');
             const color = PLATFORM_COLORS[key] || '#5B4CF5';
-            const best  = r.price === minPrice && results.length > 1;
+            const best  = r.global_best === true;
 
             return `
 <div class="product-card${best ? ' best-price' : ''}">
