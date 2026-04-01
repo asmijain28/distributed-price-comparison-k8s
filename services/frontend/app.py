@@ -104,7 +104,12 @@ def api_image_search():
             payload = {
                 "contents": [{
                     "parts": [
-                        {"text": "Identify the product in this image. Reply with only a short search query (2-5 words) suitable for searching on an e-commerce site like Amazon or Flipkart. No explanation, just the query."},
+                        {"text": (
+                                "Identify the product in this image. "
+                                "Reply with only a short search query (2-5 words) "
+                                "suitable for searching on an e-commerce site like Amazon or Flipkart. "
+                                "No explanation, just the query."
+                            )},
                         {"inline_data": {"mime_type": "image/jpeg", "data": b64}},
                     ]
                 }]
